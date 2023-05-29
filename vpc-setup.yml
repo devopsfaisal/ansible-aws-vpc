@@ -113,4 +113,28 @@
         routes:
           - dest: 0.0.0.0/0
             gateway_id: "{{igw_out.gateway_id}}"
-      register: pubRouteTable_out  
+      register: pubRouteTable_out
+
+    - name: Create new NAT Gateway and allocate an Elastic IP if NAT GW doesn't exist
+      ec2_vpc_nat_gateway:
+        state: "{{state}}"
+        subnet_id: "{{pubsub1_out.subnet.id}}"
+        wait: yes
+        region: "{{region}}"
+        if_exist_do_not_create: true
+      register: NATGW_out
+
+    - name: Setup Private Subnet Route Table
+      ec2_vpc_route_table:
+        vpc_id: "{{vpcout.vpc.id}}"
+        region: "{{region}}"
+        tags:
+          Name: vprofile-privRouteTable
+        subnets:
+          - "{{privsub1_out.subnet.id}}"
+          - "{{privsub2_out.subnet.id}}"
+          - "{{privsub3_out.subnet.id}}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{NATGW_out.nat_gateway_id}}"
+      register: privRouteTable_out
