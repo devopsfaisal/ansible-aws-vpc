@@ -1,0 +1,6 @@
+# Amazon Linux2
+bastion_ami: ami-078efad6f7ec18b8a
+
+region: ap-south-1
+
+MYIP: 182.69.176.66/32
